@@ -1,0 +1,14 @@
+{
+  "name": "elec",
+  "version": "0.1.0",
+  "description": "简单测试",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "pyreymo",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^6.0.12"
+  }
+}
