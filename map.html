@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style type="text/css">
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            font-family: "微软雅黑";
+        }
+
+        #container {
+            top: 0;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            transition: all 0.5s ease-in-out;
+        }
+
+        #info {
+            top: calc(100% - 70px);
+            position: fixed;
+            width: 100%;
+            height: 70px;
+            transition: all 0.5s ease-in-out;
+            color: rgb(242, 246, 250);
+            background-color: #455A64;
+        }
+    </style>
+    <!-- 加载地图 -->
+    <script type="text/javascript"
+        src="http://api.map.baidu.com/api?v=3.0&ak=S3W7Gd0alLQx7sNfHczlprGZQGCXrwiS"></script>
+    <title>设置地图3D视角</title>
+</head>
+
+<body>
+    <div id="container">加载失败，请检查网络连接。</div>
+    <div id="info">
+
+    </div>
+</body>
+
+</html>
+
+<script type="text/javascript">
+    var display = text => {
+        // var width = Window.innerWidth, height = Window.innerHeight;
+        document.getElementById("info").innerHTML = text;
+    };
+
+    var map = new BMap.Map("container");
+    map.centerAndZoom(new BMap.Point(118.10645304, 24.44278461), 17);
+    map.enableScrollWheelZoom();
+
+    var on_mark = true;
+    var markers = [];
+
+    // 显示点击的坐标
+    map.addEventListener("click", function (e) {
+        if (on_mark) {
+            // 添加标记
+            let marker = new BMap.Marker(new BMap.Point(e.point.lng, e.point.lat));
+            marker.enableDragging();
+            // 右键删除事件绑定
+            marker.addEventListener("rightclick", function (e) {
+                map.removeOverlay(this);
+                markers.pop(this);
+            });
+            markers.push(marker);
+            map.addOverlay(marker);
+        }
+        // 显示坐标
+        display("<p>选点  (" + e.point.lng + ", " + e.point.lat + ")<br/>" + markers + "</p>");
+    });
+
+    // 导航示例
+    var walking = new BMap.WalkingRoute(map, { renderOptions: { map: map, autoViewport: true } });
+    walking.search(new BMap.Point(118.10345304, 24.44278461), new BMap.Point(118.10645304, 24.45278461));
+
+</script>

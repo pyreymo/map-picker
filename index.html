@@ -2,50 +2,136 @@
 <html>
 
 <head>
-  <meta charset="UTF-8" />
-  <title>Hello World!</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
 </head>
 
-<style>
-  #container {
-    width: 400px;
-    height: 400px;
-    position: relative;
-    background: yellow;
+<style scoped>
+  * {
+    margin: 0;
+    padding: 0;
+    user-select: none;
   }
 
-  #animate {
+  body {
+    display: flex;
+    overflow: hidden;
+    background-color: rgb(242, 246, 250);
+  }
+
+  nav#toolbar {
+    position: fixed;
+    display: inline-flex;
+    top: 0;
+    width: 100%;
+    height: 2.2rem;
+    line-height: 2.2rem;
+    background-color: #455A64;
+  }
+
+  nav#toolbar div#title-div {
+    width: calc(100% - 150px);
+    margin-left: 15px;
+    font-size: 0.8rem;
+    -webkit-app-region: drag;
+    font-family: "Microsoft JhengHei", "SimHei";
+    color: #FFF;
+  }
+
+  nav#toolbar div.func-icon {
+    display: inline-flex;
+    height: 100%;
+  }
+
+  nav#toolbar div.func-icon p {
     width: 50px;
-    height: 50px;
-    position: absolute;
-    background-color: red;
+    height: 100%;
+    text-align: center;
+  }
+
+  nav#toolbar div.func-icon p:hover {
+    background-color: rgb(92, 120, 134);
+  }
+
+  nav#toolbar div.func-icon p svg {
+    width: 0.9rem;
+    height: 0.9rem;
   }
 </style>
 
 <body>
 
-  <p><button onclick="myMove()">单击我</button></p>
+  <nav id="toolbar">
 
-  <div id="container">
-    <div id="animate"></div>
-  </div>
+    <div id="title-div">
+      <p id="title">地图寻路</p>
+    </div>
 
-  <script>
-    function myMove() {
-      var elem = document.getElementById("animate");
-      var pos = 0;
-      var id = setInterval(frame, 5);
-      function frame() {
-        if (pos == 350) {
-          clearInterval(id);
-        } else {
-          pos++;
-          elem.style.top = pos + "px";
-          elem.style.left = pos + "px";
-        }
+    <div class="func-icon">
+
+      <p id="min-icon-p">
+        <svg id="min-icon" viewBox="0 0 1024 1024">
+          <path d="M170 469v65h682v-65z" fill="#fff"></path>
+        </svg>
+      </p>
+
+      <p id="max-icon-p">
+        <svg id="max-icon-1" viewBox="0 0 1024 1024">
+          <rect height="650" width="696" y="187" x="164" stroke-width="65" stroke="#fff" fill="transparent" />
+        </svg>
+        <svg id="max-icon-2" viewBox="-100 -100 1300 1300" style="display: none;">
+          <path
+            d="M1086.034 753.71H878.22v269.404h-70.01v-1.33H70.896v1.33H0.886V269.403H269.404V0.887h886.639v752.825h-70.01zM70.896 951.775H808.21V339.413H70.896v612.362z m1015.138-880.88h-746.62v198.509H878.22V683.7h207.813V70.896z"
+            fill="#fff">
+          </path>
+        </svg>
+      </p>
+
+      <p id="close-icon-p">
+        <svg id="close-icon" viewBox="0 0 1024 1024">
+          <path
+            d="M469 451.669333l268.501334-268.501333 60.330666 60.330667L529.664 512l268.501333 268.501333-60.330666 60.330667L469 572.330667l-268.501333 268.501333-60.330667-60.330667L409.002667 512 140.501333 243.498667l60.330667-60.330667z"
+            fill="#fff">
+          </path>
+        </svg>
+      </p>
+
+    </div>
+
+  </nav>
+
+  <iframe src="map.html" frameborder="0" style="position: fixed; margin-top: 2.2rem; width: 100%; height: calc(100% - 2.2rem);"></iframe>
+
+</body>
+
+<script>
+
+  var init_func_icons = function () {
+    document.getElementById("min-icon-p").onclick = () => {
+      let ipcRenderer = require('electron').ipcRenderer;
+      ipcRenderer.send('min');
+    };
+    document.getElementById("max-icon-p").onclick = () => {
+      let ipcRenderer = require('electron').ipcRenderer;
+
+      var isMax = document.getElementById("max-icon-1").style.display;
+      if (isMax == "") {
+        ipcRenderer.send('max');
+        document.getElementById("max-icon-2").style.display = "";
+        document.getElementById("max-icon-1").style.display = "none";
+      } else {
+        ipcRenderer.send('res');
+        document.getElementById("max-icon-1").style.display = "";
+        document.getElementById("max-icon-2").style.display = "none";
       }
-    }
-  </script>
+    };
+    document.getElementById("close-icon-p").onclick = () => {
+      let ipcRenderer = require('electron').ipcRenderer;
+      ipcRenderer.send('close');
+    };
+  }();
 
+</script>
 
 </html>
