@@ -5,8 +5,8 @@ const { app, BrowserWindow, Menu, ipcMain } = require("electron");
 // 保持对window对象的全局引用，如果不这么做的话，当JavaScript对象被
 // 垃圾回收的时候，window对象将会自动的关闭
 let mainWindow;
-var init_width = 1080,
-  init_height = 800;
+var init_width = 1400,
+  init_height = 900;
 
 function createWindow() {
   // 创建浏览器窗口。

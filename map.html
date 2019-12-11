@@ -16,30 +16,116 @@
             top: 0;
             position: fixed;
             width: 100%;
-            height: 100%;
+            height: calc(100% - 200px);
             transition: all 0.5s ease-in-out;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
-        #info {
-            top: calc(100% - 70px);
+        #info-div {
+            display: inline-flex;
+            top: calc(100% - 200px);
             position: fixed;
             width: 100%;
-            height: 70px;
+            height: 200px;
             transition: all 0.5s ease-in-out;
-            color: rgb(242, 246, 250);
-            background-color: #455A64;
+            background-color: #fefefe;
+        }
+
+        #info-div #info {
+            width: calc(100% - 52px);
+            overflow-y: scroll;
+        }
+
+        #info-div #info p {
+            margin: 0;
+            padding: 0;
+            padding-left: 18px;
+            color: #455A64;
+        }
+
+        #info-div #info p:first-child {
+            margin-top: 12px;
+            animation: fade-in;
+            animation-duration: 0.3s;
+        }
+
+        @keyframes fade-in {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        #info-div #icon {
+            width: 52px;
+            height: 100%;
+            text-align: right;
+        }
+
+        #info-div #icon svg {
+            float: inline-start;
+            cursor: pointer;
+            padding: 10px;
+            vertical-align: middle;
         }
     </style>
     <!-- 加载地图 -->
     <script type="text/javascript"
         src="http://api.map.baidu.com/api?v=3.0&ak=S3W7Gd0alLQx7sNfHczlprGZQGCXrwiS"></script>
-    <title>设置地图3D视角</title>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-color/2.1.2/jquery.color.min.js"></script>
 </head>
 
 <body>
     <div id="container">加载失败，请检查网络连接。</div>
-    <div id="info">
-
+    <div id="info-div">
+        <div id="info">
+            <p style="color: #005acc;">提示：右侧按钮自己试试。</p>
+        </div>
+        <div id="icon">
+            <svg id="marker_btn" viewBox="0 0 1024 1024" width="32" height="32" onclick="editStatusUpdate()">
+                <path id="marker_btn_path" fill="#455A64"
+                    d="M431.614693 471.535403c20.455891 21.044292 49.464575 33.564443 81.286328 33.564443l0 0c31.242562 0 60.232826-12.519128 80.68974-33.564443 21.035082-20.485567 33.534767-49.503461 33.534767-80.796164l0 0 0 0c0-31.858592-12.500709-60.867276-33.534767-81.353866-20.455891-21.052478-49.446156-33.56342-80.68974-33.56342l0 0c-31.821753 0-60.829414 12.511965-81.286328 33.56342l0 0c-21.014616 20.48659-33.517371 49.496298-33.517371 81.353866C398.097322 422.031942 410.600077 451.049836 431.614693 471.535403L431.614693 471.535403zM395.247414 272.980231c30.126134-30.154787 71.616084-48.935526 117.653607-48.935526l0 0c45.459355 0 86.949304 18.780739 117.076462 48.935526 30.107715 30.145577 48.866964 71.684646 48.866964 117.759007 0 45.51666-18.759249 87.046518-48.866964 117.201306-30.127158 30.16502-71.617108 48.927339-117.076462 48.927339l0 0c-46.036499 0-87.526449-18.762319-117.653607-48.927339-30.126134-30.154787-48.867988-71.684646-48.867988-117.201306C346.379427 344.664877 365.12128 303.125809 395.247414 272.980231L395.247414 272.980231zM237.835292 390.739239c0 221.891669 241.528915 461.397508 275.064706 493.836315 33.515325-32.438806 274.486538-271.944646 274.486538-493.836315l0 0c0-76.229149-30.68486-145.073096-80.132038-195.135282-50.005904-49.503461-118.770034-80.216973-194.355523-80.216973l0 0c-76.162634 0-144.92881 30.713512-194.933691 80.216973C268.521175 245.667166 237.835292 314.51009 237.835292 390.739239L237.835292 390.739239zM281.600051 159.188582c59.096956-59.163471 140.922566-95.578846 231.30097-95.578846l0 0c89.780793 0 171.624822 36.414351 230.721779 95.578846 59.117422 59.173704 95.484701 141.095505 95.484701 231.550657 0 261.148765-317.692572 560.964178-322.238099 566.088896l-0.558725 0 0 0-3.986801 3.408633-3.408633-3.408633c-1.13587-1.137916-322.796824-303.245536-322.796824-566.088896C186.116373 300.284087 222.483652 218.362286 281.600051 159.188582L281.600051 159.188582z">
+                </path>
+            </svg>
+            <svg id="nav_btn" viewBox="-100 -100 1224 1224" width="32" height="32" onclick="navStatusUpdate()">
+                <path id="nav_btn_path" fill="#455A64"
+                    d="M559.446001 974.871069c-1.332399 0-2.662752-0.084934-4.021758-0.282433-12.770361-1.784646-22.823733-11.835559-24.608452-24.635073l-56.265727-401.479861L73.720976 492.111021c-12.800038-1.783623-22.823733-11.836583-24.607429-24.635073-1.81235-12.798491 5.096274-25.200962 16.877057-30.453592l866.448392-385.352555c10.931405-4.799306 23.702789-2.478448 32.168948 5.988388 8.468206 8.452509 10.817813 21.252023 5.976353 32.209586L585.837126 957.681572C581.135864 968.230835 570.744788 974.871069 559.446001 974.871069zM181.693413 448.857914 504.142221 494.205729c12.799015 1.784646 22.823733 11.836583 24.607429 24.635073l45.279061 322.945203L887.357441 135.045719 181.693413 448.857914z">
+                </path>
+            </svg>
+            <script>
+                $(function () {
+                    $("#marker_btn").hover(
+                        function () {
+                            $(this).animate({
+                                backgroundColor: '#f2f6fa'
+                            }, 200);
+                        },
+                        function () {
+                            $(this).animate({
+                                backgroundColor: '#fefefe'
+                            }, 200);
+                        }
+                    );
+                    $("#nav_btn").hover(
+                        function () {
+                            $(this).animate({
+                                backgroundColor: '#f2f6fa'
+                            }, 200);
+                        },
+                        function () {
+                            $(this).animate({
+                                backgroundColor: '#fefefe'
+                            }, 200);
+                        }
+                    );
+                });
+            </script>
+        </div>
     </div>
 </body>
 
@@ -47,37 +133,282 @@
 
 <script type="text/javascript">
     var display = text => {
-        // var width = Window.innerWidth, height = Window.innerHeight;
-        document.getElementById("info").innerHTML = text;
+        var info = document.getElementById("info");
+        info.innerHTML = text + info.innerHTML;
+    }
+
+    Date.prototype.format = function (b) {
+        var a = this, weeks = ["日", "一", "二", "三", "四", "五", "六"],
+            o = {
+                "M+": a.getMonth() + 1,
+                "d+": a.getDate(),
+                "h+": a.getHours(),
+                "m+": a.getMinutes(),
+                "s+": a.getSeconds(),
+                "W": weeks[a.getDay()],
+                "q+": Math.floor((a.getMonth() + 3) / 3),
+                "S": a.getMilliseconds()
+            };
+        if (/(y+)/.test(b)) {
+            b = b.replace(RegExp.$1, (a.getFullYear() + "").substr(4 - RegExp.$1.length));
+        };
+        for (var k in o) {
+            if (new RegExp("(" + k + ")").test(b)) {
+                b = b.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+            }
+        };
+        return b;
     };
+
+    var getTime = () => `<span style="color: #AAA;">` + new Date().format("[hh:mm:ss] ") + `</span>`;
+
+    var adjMat = new Array();
+
+    // 初始化标记点列表
+    var origin_markers = [];
+    var markers = new Proxy(origin_markers, {
+        get: function (target, key, receiver) {
+            return target[key];
+        },
+        set: function (target, key, value, receiver) {
+            target[key] = value;
+            return true;
+        }
+    });
+
+    // 初始化flags
+    var flags = { 'edit': !true, 'nav': !false };
+
+    var editStatusUpdate = function () {
+        let bool = flags['edit'];
+        origin_markers.forEach(elm => {
+            bool ? elm.disableDragging() : elm.enableDragging();
+        });
+        flags['edit'] = !bool;
+        if (flags['edit']) {
+            document.getElementById("marker_btn_path").setAttribute("fill", "#455A64");
+            display(`<p style="color: #005acc;">提示：鼠标标记模式已开启，请在地图上标记你要去的景点。标记可拖动，按右键删除。</p>`);
+        }
+        else {
+            document.getElementById("marker_btn_path").setAttribute("fill", "#dee8f1");
+            display(`<p style="color: #005acc;">提示：鼠标标记模式已关闭，所有标记已经锁定。按 C 快速清除所有标记。</p>`);
+        }
+        console.log("origin_markers", origin_markers);
+
+    };
+    editStatusUpdate();
+
+    /**
+    * @param {number} sourceV 源点的索引，从0开始
+    * @param {Array} adjMatrix 图的邻接矩阵，是一个二维数组
+    */
+
+    function dijkstra(sourceV, adjMatrix) {
+        var set = [],
+            path = [],
+
+            dist = [];
+        distCopy = [],
+            vertexNum = adjMatrix.length;
+
+        var temp, u,
+            count = 0;
+
+        // 初始化
+        for (var i = 0; i < vertexNum; i++) {
+            distCopy[i] = dist[i] = Infinity;
+            set[i] = false;
+        }
+        distCopy[sourceV] = dist[sourceV] = 0;
+
+        while (count < vertexNum) {
+            u = distCopy.indexOf(Math.min.apply(Math, distCopy));
+            set[u] = true;
+            distCopy[u] = Infinity;
+
+            for (var i = 0; i < vertexNum; i++) {
+                if (!set[i] && ((temp = dist[u] + adjMatrix[u][i]) < dist[i])) {
+                    distCopy[i] = dist[i] = temp;
+                    path[i] = u;
+                }
+            }
+            count++;
+        }
+
+        return {
+            path: path,
+            dist: dist
+        };
+    }
+
+    /**
+    * @param {number} v 源点索引, 从0开始
+    * @param {number} d 非源点索引, 从0开始
+    * @param {Array} adjMatrix 图的邻接矩阵，是一个二维数组
+    */
+    function searchPath(v, d, adjMatrix) {
+        var graph = dijkstra(v, adjMatrix),
+            path = graph.path,
+            dist = graph.dist;
+
+        var prev = path[d],
+            queue = [],
+            str = '';
+
+        queue.push(d);
+        while (prev != v) {
+            queue.push(prev);
+            prev = path[prev];
+        }
+        queue.push(v);
+
+        for (var j = queue.length - 1; j >= 0; j--) {
+            str += queue.pop() + '->';
+        }
+        console.log('path', str);
+        var arr = str.split('->');
+        if (str.endsWith('->')) {
+            arr.pop();
+        }
+        var rarr = [];//字符串数组转int数组
+        for (var i = 0; i < arr.length; i++) {
+            rarr.push(parseInt(arr[i]));
+        }
+        return rarr;
+    }
+
+    var navStatusUpdate = function () {
+        let bool = flags['nav'];
+        // origin_markers.forEach(elm => {
+        // //     bool ? elm.disableDragging() : elm.enableDragging();
+        // // });
+        flags['nav'] = !bool;
+        if (flags['nav']) {
+            var len = origin_markers['length'];
+            adjMat = new Array(len);
+            for (let index = 0; index < len; index++) {
+                adjMat[index] = new Array(len);
+            }
+
+
+            function getAddress(index) {
+                let that = this;
+                Promise.all(() => {
+                    for (let i = 0; i < len; i++) {
+                        for (let j = 0; j < len; j++) {
+                            if (i != j) {
+                                getduration(i, j, adjMat);
+                            }
+                            else adjMat[i][j] = 0;
+                        }
+                    }
+                    return new Promise(resolve => {
+                        resolve(adjMat);
+                    });
+                }
+                ).then(function (posts) {
+                    that.address = posts;
+                    that.listData = index;
+                })
+            }
+
+
+
+            for (let i = 0; i < len; i++) {
+                for (let j = 0; j < len; j++) {
+                    if (i != j) {
+                        getduration(i, j, adjMat);
+                    }
+                    else adjMat[i][j] = 0;
+                }
+            }
+            console.log(searchPath(0, len - 1, adjMat));
+
+
+
+            // const matrix = [
+            //     [0, 1399, 869, 768, 2865, 3676, 4750, 4838, 2802],
+            //     [1399, 0, 568, 1103, 1964, 3858, 4952, 3662, 3004],
+            //     [869, 568, 0, 731, 2321, 3531, 4625, 4007, 2677],
+            //     [768, 1103, 731, 0, 2572, 2974, 4068, 4545, 2121],
+            //     [2865, 1964, 2321, 2515, 0, 4808, 4811, 1806, 3954],
+            //     [3676, 3858, 3531, 2974, 4808, 0, 3671, 5812, 2246],
+            //     [4750, 4952, 4625, 4068, 4811, 3671, 0, 3290, 1985],
+            //     [4838, 3662, 4007, 4488, 1806, 5812, 3290, 0, 4779],
+            //     [2802, 3004, 2677, 2121, 3954, 2246, 1985, 4779, 0]
+            // ];
+
+            // setTimeout(() => {
+            //     // console.log("adjMat", adjMat);
+            //     // console.log("matrix", matrix);
+            //     console.log(searchPath(0, len - 1, adjMat));
+            // }, 2000);
+
+            document.getElementById("nav_btn_path").setAttribute("fill", "#455A64");
+            display(`<p style="color: #005acc;">提示：导航模式已开启，请在标记点中依次点击起点和终点，程序会帮你生成一条最短路径。</p>`);
+        }
+        else {
+            document.getElementById("nav_btn_path").setAttribute("fill", "#dee8f1");
+            display(`<p style="color: #005acc;">提示：导航模式已关闭。</p>`);
+        }
+    };
+    navStatusUpdate();
+
 
     var map = new BMap.Map("container");
     map.centerAndZoom(new BMap.Point(118.10645304, 24.44278461), 17);
     map.enableScrollWheelZoom();
 
-    var on_mark = true;
-    var markers = [];
-
-    // 显示点击的坐标
     map.addEventListener("click", function (e) {
-        if (on_mark) {
+        if (flags['edit']) {
             // 添加标记
             let marker = new BMap.Marker(new BMap.Point(e.point.lng, e.point.lat));
             marker.enableDragging();
             // 右键删除事件绑定
             marker.addEventListener("rightclick", function (e) {
-                map.removeOverlay(this);
-                markers.pop(this);
+                if (flags['edit']) {
+                    map.removeOverlay(this);
+                    markers.pop(this);
+                    display(`<p>${getTime()}删除：删除一点</p>`);
+                }
             });
             markers.push(marker);
             map.addOverlay(marker);
+            // 显示坐标
+            display(`<p>${getTime()}标点：(${e.point.lng}, ${e.point.lat})</p>`);
         }
-        // 显示坐标
-        display("<p>选点  (" + e.point.lng + ", " + e.point.lat + ")<br/>" + markers + "</p>");
     });
 
-    // 导航示例
-    var walking = new BMap.WalkingRoute(map, { renderOptions: { map: map, autoViewport: true } });
-    walking.search(new BMap.Point(118.10345304, 24.44278461), new BMap.Point(118.10645304, 24.45278461));
+    // 获取两点之间的距离
+
+    var getduration = function (i, j, mat) {
+        let walkingRoute = new BMap.WalkingRoute(map, {
+            renderOptions: { map: null },
+            onSearchComplete: function (results) {
+                mat[i][j] = results.getPlan(0).getDistance(false);
+            }
+        });
+        walkingRoute.search(markers[i].point, markers[j].point);
+    }
+
+    $(document).ready(function () {
+        $("body").keyup(
+            function (event) {
+                switch (event.which) {
+                    case 67:
+                        // 删除全部点
+                        origin_markers = [];
+                        map.clearOverlays();
+                        display(`<p style="color: #f05acc;">${getTime()}删除：全部删除</p>`)
+                        break;
+                    case 27:
+                        // ESC
+                        break;
+                    default:
+                        break;
+                }
+            }
+        );
+    })
 
 </script>
