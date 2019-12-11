@@ -5,7 +5,7 @@ const { app, BrowserWindow, Menu, ipcMain } = require("electron");
 // 保持对window对象的全局引用，如果不这么做的话，当JavaScript对象被
 // 垃圾回收的时候，window对象将会自动的关闭
 let mainWindow;
-var init_width = 1400,
+var init_width = 1200,
   init_height = 900;
 
 function createWindow() {
@@ -24,7 +24,7 @@ function createWindow() {
   mainWindow.loadFile("index.html");
 
   // 打开开发者工具
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   // 当 window 被关闭，这个事件会被触发。
   mainWindow.on("closed", () => {

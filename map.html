@@ -132,11 +132,11 @@
 </html>
 
 <script type="text/javascript">
+    // 几个全局函数定义
     var display = text => {
         var info = document.getElementById("info");
         info.innerHTML = text + info.innerHTML;
     }
-
     Date.prototype.format = function (b) {
         var a = this, weeks = ["日", "一", "二", "三", "四", "五", "六"],
             o = {
@@ -159,63 +159,27 @@
         };
         return b;
     };
-
     var getTime = () => `<span style="color: #AAA;">` + new Date().format("[hh:mm:ss] ") + `</span>`;
 
-    var adjMat = new Array();
+    // 初始化变量
+    var adjMat = new Array();  // 初始化空邻接矩阵
+    var markers = [];  // 初始化标记点列表
+    var navs = [];  // 初始化起止点列表
+    var flags = { 'edit': !true, 'nav': !false };  // 初始化flags
+    var completePoints = 0;  // 搜索到的所有点
 
-    // 初始化标记点列表
-    var origin_markers = [];
-    var markers = new Proxy(origin_markers, {
-        get: function (target, key, receiver) {
-            return target[key];
-        },
-        set: function (target, key, value, receiver) {
-            target[key] = value;
-            return true;
-        }
-    });
 
-    // 初始化flags
-    var flags = { 'edit': !true, 'nav': !false };
 
-    var editStatusUpdate = function () {
-        let bool = flags['edit'];
-        origin_markers.forEach(elm => {
-            bool ? elm.disableDragging() : elm.enableDragging();
-        });
-        flags['edit'] = !bool;
-        if (flags['edit']) {
-            document.getElementById("marker_btn_path").setAttribute("fill", "#455A64");
-            display(`<p style="color: #005acc;">提示：鼠标标记模式已开启，请在地图上标记你要去的景点。标记可拖动，按右键删除。</p>`);
-        }
-        else {
-            document.getElementById("marker_btn_path").setAttribute("fill", "#dee8f1");
-            display(`<p style="color: #005acc;">提示：鼠标标记模式已关闭，所有标记已经锁定。按 C 快速清除所有标记。</p>`);
-        }
-        console.log("origin_markers", origin_markers);
+    // Dijkstra 算法
+    var dijkstra = function (sourceV, adjMatrix) {
+        let set = [], path = [], dist = [];
+        distCopy = [];
+        vertexNum = adjMatrix.length;
 
-    };
-    editStatusUpdate();
-
-    /**
-    * @param {number} sourceV 源点的索引，从0开始
-    * @param {Array} adjMatrix 图的邻接矩阵，是一个二维数组
-    */
-
-    function dijkstra(sourceV, adjMatrix) {
-        var set = [],
-            path = [],
-
-            dist = [];
-        distCopy = [],
-            vertexNum = adjMatrix.length;
-
-        var temp, u,
-            count = 0;
+        let temp, u, count = 0;
 
         // 初始化
-        for (var i = 0; i < vertexNum; i++) {
+        for (let i = 0; i < vertexNum; i++) {
             distCopy[i] = dist[i] = Infinity;
             set[i] = false;
         }
@@ -226,7 +190,7 @@
             set[u] = true;
             distCopy[u] = Infinity;
 
-            for (var i = 0; i < vertexNum; i++) {
+            for (let i = 0; i < vertexNum; i++) {
                 if (!set[i] && ((temp = dist[u] + adjMatrix[u][i]) < dist[i])) {
                     distCopy[i] = dist[i] = temp;
                     path[i] = u;
@@ -241,118 +205,83 @@
         };
     }
 
-    /**
-    * @param {number} v 源点索引, 从0开始
-    * @param {number} d 非源点索引, 从0开始
-    * @param {Array} adjMatrix 图的邻接矩阵，是一个二维数组
-    */
-    function searchPath(v, d, adjMatrix) {
-        var graph = dijkstra(v, adjMatrix),
+    // 计算最短路径
+    var searchPath = function (v, d, adjMatrix) {
+        let graph = dijkstra(v, adjMatrix),
             path = graph.path,
             dist = graph.dist;
 
-        var prev = path[d],
+        let prev = path[d],
             queue = [],
             str = '';
 
         queue.push(d);
+
+        let n = 0;
+        const MAX_ITER = 900;  // 限制最大迭代次数
+
         while (prev != v) {
+            n++;
+            if (n > MAX_ITER) return [-1];  // 防止失败时进入死循环
             queue.push(prev);
             prev = path[prev];
         }
         queue.push(v);
 
-        for (var j = queue.length - 1; j >= 0; j--) {
+        for (let j = queue.length - 1; j >= 0; j--) {
             str += queue.pop() + '->';
         }
-        console.log('path', str);
-        var arr = str.split('->');
+        // console.log('路径', str);
+        let arr = str.split('->');
         if (str.endsWith('->')) {
             arr.pop();
         }
-        var rarr = [];//字符串数组转int数组
-        for (var i = 0; i < arr.length; i++) {
+        let rarr = [];  // 字符串数组转int数组
+        for (let i = 0; i < arr.length; i++) {
             rarr.push(parseInt(arr[i]));
         }
         return rarr;
     }
 
+    // 第二个按钮的回调函数
     var navStatusUpdate = function () {
         let bool = flags['nav'];
-        // origin_markers.forEach(elm => {
-        // //     bool ? elm.disableDragging() : elm.enableDragging();
-        // // });
         flags['nav'] = !bool;
+
         if (flags['nav']) {
-            var len = origin_markers['length'];
-            adjMat = new Array(len);
-            for (let index = 0; index < len; index++) {
-                adjMat[index] = new Array(len);
+            if (flags['edit']) {  // 同时关闭地图选点功能
+                editStatusUpdate();
             }
-
-
-            function getAddress(index) {
-                let that = this;
-                Promise.all(() => {
-                    for (let i = 0; i < len; i++) {
-                        for (let j = 0; j < len; j++) {
-                            if (i != j) {
-                                getduration(i, j, adjMat);
-                            }
-                            else adjMat[i][j] = 0;
-                        }
-                    }
-                    return new Promise(resolve => {
-                        resolve(adjMat);
-                    });
-                }
-                ).then(function (posts) {
-                    that.address = posts;
-                    that.listData = index;
-                })
-            }
-
-
-
-            for (let i = 0; i < len; i++) {
-                for (let j = 0; j < len; j++) {
-                    if (i != j) {
-                        getduration(i, j, adjMat);
-                    }
-                    else adjMat[i][j] = 0;
-                }
-            }
-            console.log(searchPath(0, len - 1, adjMat));
-
-
-
-            // const matrix = [
-            //     [0, 1399, 869, 768, 2865, 3676, 4750, 4838, 2802],
-            //     [1399, 0, 568, 1103, 1964, 3858, 4952, 3662, 3004],
-            //     [869, 568, 0, 731, 2321, 3531, 4625, 4007, 2677],
-            //     [768, 1103, 731, 0, 2572, 2974, 4068, 4545, 2121],
-            //     [2865, 1964, 2321, 2515, 0, 4808, 4811, 1806, 3954],
-            //     [3676, 3858, 3531, 2974, 4808, 0, 3671, 5812, 2246],
-            //     [4750, 4952, 4625, 4068, 4811, 3671, 0, 3290, 1985],
-            //     [4838, 3662, 4007, 4488, 1806, 5812, 3290, 0, 4779],
-            //     [2802, 3004, 2677, 2121, 3954, 2246, 1985, 4779, 0]
-            // ];
-
-            // setTimeout(() => {
-            //     // console.log("adjMat", adjMat);
-            //     // console.log("matrix", matrix);
-            //     console.log(searchPath(0, len - 1, adjMat));
-            // }, 2000);
-
             document.getElementById("nav_btn_path").setAttribute("fill", "#455A64");
-            display(`<p style="color: #005acc;">提示：导航模式已开启，请在标记点中依次点击起点和终点，程序会帮你生成一条最短路径。</p>`);
-        }
-        else {
+            display(`<p style="color: #005acc;">提示：导航模式已开启，请在标记点中依次点击起点和终点，程序会帮你找找有没有经过其他标记的近路。</p>`);
+        } else {
             document.getElementById("nav_btn_path").setAttribute("fill", "#dee8f1");
             display(`<p style="color: #005acc;">提示：导航模式已关闭。</p>`);
         }
     };
     navStatusUpdate();
+
+    // 第一个按钮的回调函数
+    var editStatusUpdate = function () {
+        let bool = flags['edit'];
+        markers.forEach(elm => {
+            bool ? elm.disableDragging() : elm.enableDragging();
+        });
+        flags['edit'] = !bool;
+        if (flags['edit']) {
+            if (flags['nav']) {  // 同时关闭地图选点功能
+                navStatusUpdate();
+            }
+            document.getElementById("marker_btn_path").setAttribute("fill", "#455A64");
+            display(`<p style="color: #005acc;">提示：鼠标标记模式已开启，请在地图上标记你要去的景点。标记可拖动，按右键删除。</p>`);
+        }
+        else {
+            document.getElementById("marker_btn_path").setAttribute("fill", "#dee8f1");
+            display(`<p style="color: #005acc;">提示：鼠标标记模式已关闭，所有标记已经锁定。按 C 快速清除所有标记。</p>`);
+        }
+        // console.log("markers", markers);
+    };
+    editStatusUpdate();
 
 
     var map = new BMap.Map("container");
@@ -361,17 +290,72 @@
 
     map.addEventListener("click", function (e) {
         if (flags['edit']) {
+
             // 添加标记
             let marker = new BMap.Marker(new BMap.Point(e.point.lng, e.point.lat));
             marker.enableDragging();
-            // 右键删除事件绑定
+
+            // 事件：编辑状态下右键删除
             marker.addEventListener("rightclick", function (e) {
                 if (flags['edit']) {
                     map.removeOverlay(this);
                     markers.pop(this);
-                    display(`<p>${getTime()}删除：删除一点</p>`);
+                    display(`<p style="color: #f00aac;">${getTime()}删除：删除一点</p>`);
                 }
             });
+
+            // 事件：导航状态下点击选点
+            marker.addEventListener("click", function (e) {
+                if (flags['nav']) {
+                    if (navs.length > 0) {
+                        m = navs.pop();
+                        // console.log(markers);
+                        // console.log(m.point, this.point);
+
+                        let len = markers['length'];
+
+                        // 重新初始化邻接矩阵
+                        adjMat = new Array(len);
+                        for (let index = 0; index < len; index++) {
+                            adjMat[index] = new Array(len);
+                        }
+
+                        // 计算邻接矩阵
+                        for (let i = 0; i < len; i++) {
+                            for (let j = 0; j < len; j++) {
+                                if (i != j) {
+                                    getduration(i, j, adjMat);
+                                }
+                                else adjMat[i][j] = 0;
+                            }
+                        }
+
+                        display(`<p style="color: #ff8c31;">${getTime()}开始搜索最小路径……</p>`);
+                        var time = setInterval(() => {
+                            if (completePoints === len * (len - 1)) {
+                                completePoints = 0;
+                                path = searchPath(markers.indexOf(m), markers.indexOf(this), adjMat);
+                                clearInterval(time);
+
+                                if (path.length > 1) {
+                                    for (let index = 0; index < path.length - 1; index++) {
+                                        let walkingRoute = new BMap.WalkingRoute(map, {
+                                            renderOptions: { map: map },
+                                            onSearchComplete: () => {
+                                                display(`<p style="color: #ff8c31;">${getTime()}搜索成功！</p>`);
+                                            }
+                                        });
+                                        
+                                        walkingRoute.search(markers[path[index]].point, markers[path[index + 1]].point);
+                                    }
+                                }
+                            }
+                        }, 50);
+
+                    }
+                    else navs.push(this);
+                }
+            })
             markers.push(marker);
             map.addOverlay(marker);
             // 显示坐标
@@ -380,12 +364,17 @@
     });
 
     // 获取两点之间的距离
-
     var getduration = function (i, j, mat) {
         let walkingRoute = new BMap.WalkingRoute(map, {
             renderOptions: { map: null },
             onSearchComplete: function (results) {
-                mat[i][j] = results.getPlan(0).getDistance(false);
+                if (walkingRoute.getStatus() == BMAP_STATUS_SUCCESS) {
+                    mat[i][j] = results.getPlan(0).getDistance(false);
+                }
+                else {
+                    mat[i][j] = Infinity;
+                }
+                completePoints++;
             }
         });
         walkingRoute.search(markers[i].point, markers[j].point);
@@ -397,12 +386,9 @@
                 switch (event.which) {
                     case 67:
                         // 删除全部点
-                        origin_markers = [];
+                        markers = [];
                         map.clearOverlays();
-                        display(`<p style="color: #f05acc;">${getTime()}删除：全部删除</p>`)
-                        break;
-                    case 27:
-                        // ESC
+                        display(`<p style="color: #f00aac;">${getTime()}删除：全部删除</p>`)
                         break;
                     default:
                         break;
